@@ -16,6 +16,10 @@
 #define KEYBOARD_LED_EPADDR 0x01
 #define KEYBOARD_MOUSE_EPSIZE 9
 
+#define REPORT_ID_KEYBOARD 1
+#define REPORT_ID_MOUSE 2
+#define REPORT_ID_CONSUMER 3
+
 /** Type define for the device configuration descriptor structure. This must be
  * defined in the application code, as the configuration descriptor contains
  * several sub-descriptors which vary between devices, and which describe the

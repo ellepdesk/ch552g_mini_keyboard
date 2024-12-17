@@ -17,6 +17,7 @@ volatile __xdata uint8_t UpPoint1_Busy =
     0; // Flag of whether upload pointer is busy
 
 __xdata uint8_t HIDKey[8] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
+__xdata uint8_t HIDConsumer[4] = {0x0, 0x0, 0x0, 0x0};
 __xdata uint8_t HIDMouse[4] = {0x0, 0x0, 0x0, 0x0};
 
 #define SHIFT 0x80
@@ -192,21 +193,29 @@ uint8_t USB_EP1_send(__data uint8_t reportID) {
       return 0;
   }
 
-  if (reportID == 1) {
-    Ep1Buffer[64 + 0] = 1;
+  if (reportID == REPORT_ID_KEYBOARD) {
+    Ep1Buffer[64 + 0] = REPORT_ID_KEYBOARD;
     for (__data uint8_t i = 0; i < sizeof(HIDKey); i++) { // load data for
                                                           // upload
       Ep1Buffer[64 + 1 + i] = HIDKey[i];
     }
     UEP1_T_LEN = 1 + sizeof(HIDKey); // data length
-  } else if (reportID == 2) {
-    Ep1Buffer[64 + 0] = 2;
+  } else if (reportID == REPORT_ID_MOUSE) {
+    Ep1Buffer[64 + 0] = REPORT_ID_MOUSE;
     for (__data uint8_t i = 0; i < sizeof(HIDMouse);
          i++) { // load data for upload
       Ep1Buffer[64 + 1 + i] = ((uint8_t *)HIDMouse)[i];
     }
     UEP1_T_LEN = 1 + sizeof(HIDMouse); // data length
-  } else {
+  } else if (reportID == REPORT_ID_CONSUMER) {
+    Ep1Buffer[64 + 0] = REPORT_ID_CONSUMER;
+    for (__data uint8_t i = 0; i < sizeof(HIDConsumer);
+         i++) { // load data for upload
+      Ep1Buffer[64 + 1 + i] = ((uint8_t *)HIDConsumer)[i];
+    }
+    UEP1_T_LEN = 1 + sizeof(HIDConsumer); // data length
+  }
+  else {
     UEP1_T_LEN = 0;
   }
 
@@ -253,7 +262,7 @@ uint8_t Keyboard_press(__data uint8_t k) {
       return 0;
     }
   }
-  USB_EP1_send(1);
+  USB_EP1_send(REPORT_ID_KEYBOARD);
   return 1;
 }
 
@@ -285,7 +294,7 @@ uint8_t Keyboard_release(__data uint8_t k) {
     }
   }
 
-  USB_EP1_send(1);
+  USB_EP1_send(REPORT_ID_KEYBOARD);
   return 1;
 }
 
@@ -293,7 +302,7 @@ void Keyboard_releaseAll(void) {
   for (__data uint8_t i = 0; i < sizeof(HIDKey); i++) { // load data for upload
     HIDKey[i] = 0;
   }
-  USB_EP1_send(1);
+  USB_EP1_send(REPORT_ID_KEYBOARD);
 }
 
 uint8_t Keyboard_write(__data uint8_t c) {
@@ -307,17 +316,52 @@ uint8_t Keyboard_getLEDStatus() {
   return Ep1Buffer[0]; // The only info we gets
 }
 
+uint8_t Consumer_press(__data uint8_t k) {
+  for (__data uint8_t i=0; i < sizeof(HIDConsumer); i++){
+    if (HIDConsumer[i] ==0){
+      HIDConsumer[i] = k;
+      break;
+    }
+  }
+  USB_EP1_send(REPORT_ID_CONSUMER);
+  return 1;
+}
+
+uint8_t Consumer_release(__data uint8_t k) {
+  for (__data uint8_t i=0; i < sizeof(HIDConsumer); i++){
+    if (HIDConsumer[i] == k){
+      HIDConsumer[i] = 0;
+    }
+  }
+  USB_EP1_send(REPORT_ID_CONSUMER);
+  return 1;
+}
+
+void Consumer_releaseAll(void) {
+    memset(HIDConsumer, 0, sizeof(HIDConsumer));
+    USB_EP1_send(REPORT_ID_CONSUMER);
+}
+
+uint8_t Consumer_write(__data uint8_t c) {
+  __data uint8_t p = Consumer_press(c);
+  Consumer_release(c);
+  return p;
+}
+// uint8_t Keyboard_getLEDStatus() {
+
+
+
 uint8_t Mouse_press(__data uint8_t k) {
   memset(HIDMouse, 0, sizeof(HIDMouse));
   HIDMouse[0] |= k;
-  USB_EP1_send(2);
+  USB_EP1_send(REPORT_ID_MOUSE);
   return 1;
 }
 
 uint8_t Mouse_release(__data uint8_t k) {
   memset(HIDMouse, 0, sizeof(HIDMouse));
   HIDMouse[0] &= ~k;
-  USB_EP1_send(2);
+  USB_EP1_send(REPORT_ID_MOUSE);
   return 1;
 }
 
@@ -332,13 +376,13 @@ uint8_t Mouse_move(__data int8_t x, __xdata int8_t y) {
   memset(HIDMouse, 0, sizeof(HIDMouse));
   HIDMouse[1] = x;
   HIDMouse[2] = y;
-  USB_EP1_send(2);
+  USB_EP1_send(REPORT_ID_MOUSE);
   return 1;
 }
 
 uint8_t Mouse_scroll(__data int8_t tilt) {
   memset(HIDMouse, 0, sizeof(HIDMouse));
   HIDMouse[3] = tilt;
-  USB_EP1_send(2);
+  USB_EP1_send(REPORT_ID_MOUSE);
   return 1;
 }

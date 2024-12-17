@@ -159,6 +159,25 @@ static void keyboard_run_mouse_sequence(button_mouse_t sequence, keyboard_button
   }
 }
 
+static void keyboard_run_consumer_sequence(button_sequence_t sequence, keyboard_button_keyboard_mode_t mode)
+{if (mode == BTM_RELEASE)
+  {
+    return;
+  }
+
+  for (uint8_t i = 0; i < sequence.length; i++)
+  {
+    Consumer_press(sequence.sequence[i]);
+    delay(10);
+    if (sequence.delay > 0)
+    {
+      Consumer_release(sequence.sequence[i]);
+      delay(sequence.delay);
+    }
+  }
+  Consumer_releaseAll();}
+
+
 void keyboard_press_button(keyboard_button_t button, keyboard_button_keyboard_mode_t mode)
 {
   if (button >= BTN_1 && button <= BTN_3)
@@ -180,6 +199,9 @@ void keyboard_press_button(keyboard_button_t button, keyboard_button_keyboard_mo
     break;
   case BUTTON_MOUSE:
     keyboard_run_mouse_sequence(configurations[current_mode_s].button[button].function.mouse, mode);
+    break;
+  case BUTTON_CONSUMER:
+    keyboard_run_consumer_sequence(configurations[current_mode_s].button[button].function.sequence, mode);
     break;
   case BUTTON_AUTO_KEYBOARD:
     if (mode == BTM_PRESS)

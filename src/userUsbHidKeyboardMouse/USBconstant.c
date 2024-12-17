@@ -92,7 +92,7 @@ __code uint8_t ReportDescriptor[] = {
     0x05, 0x01,       // USAGE_PAGE (Generic Desktop)
     0x09, 0x06,       // USAGE (Keyboard)
     0xa1, 0x01,       // COLLECTION (Application)
-    0x85, 0x01,       //   REPORT_ID (1)
+    0x85, REPORT_ID_KEYBOARD,       //   REPORT_ID (1)
     0x05, 0x07,       //   USAGE_PAGE (Keyboard)
     0x19, 0xe0,       //   USAGE_MINIMUM (Keyboard LeftControl)
     0x29, 0xe7,       //   USAGE_MAXIMUM (Keyboard Right GUI)
@@ -124,12 +124,13 @@ __code uint8_t ReportDescriptor[] = {
     0x75, 0x03,       //   REPORT_SIZE (3)
     0x91, 0x03,       //   OUTPUT (Cnst,Var,Abs)
     0xc0,             // END_COLLECTION
+
     0x05, 0x01,       // USAGE_PAGE (Generic Desktop)
     0x09, 0x02,       // USAGE (Mouse)
     0xa1, 0x01,       // COLLECTION (Application)
     0x09, 0x01,       //   USAGE (Pointer)
     0xa1, 0x00,       //   COLLECTION (Physical)
-    0x85, 0x02,       //   REPORT_ID (2)
+    0x85, REPORT_ID_MOUSE,       //   REPORT_ID (2)
     0x05, 0x09,       //     USAGE_PAGE (Button)
     0x19, 0x01,       //     USAGE_MINIMUM (Button 1)
     0x29, 0x03,       //     USAGE_MAXIMUM (Button 3)
@@ -151,7 +152,22 @@ __code uint8_t ReportDescriptor[] = {
     0x95, 0x03,       //     REPORT_COUNT (3)
     0x81, 0x06,       //     INPUT (Data,Var,Rel)
     0xc0,             //     END_COLLECTION
-    0xc0              // END_COLLECTION
+
+	0x05, 0x0C,									/* usage page (consumer device) */
+	0x09, 0x01, 								/* usage -- consumer control */
+	0xA1, 0x01, 								/* collection (application) */
+	0x85, REPORT_ID_CONSUMER, 		/* report id */
+	/* 4 Media Keys */
+	0x15, 0x00, 								/* logical minimum */
+	0x26, 0xFF, 0x03, 							/* logical maximum (3ff) */
+	0x19, 0x00, 								/* usage minimum (0) */
+	0x2A, 0xFF, 0x03, 							/* usage maximum (3ff) */
+	0x95, 0x04, 								/* report count (4) */
+	0x75, 0x10, 								/* report size (16) */
+	0x81, 0x00, 								/* input */
+	0xC0, /* end collection */
+
+    0xc0,              // END_COLLECTION
 };
 
 // String Descriptors

@@ -52,6 +52,7 @@ typedef enum
 {
   BUTTON_SEQUENCE, // send button_sequence_t tyoe
   BUTTON_MOUSE,    // send button_mouse_t type
+  BUTTON_CONSUMER,
   BUTTON_AUTO_KEYBOARD,    // send continuosly button_sequence_t tyoe
   BUTTON_AUTO_MOUSE,    // send continuosly button_mouse_t type
   BUTTON_FUNCTION, // send function pointer
